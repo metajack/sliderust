@@ -107,11 +107,56 @@
   <!-- WebAudio doesn't have any security considerations of its own. These
   were from implementation failures. Most web features are like this. -->
 
-  <h1 class="center-title">Rust</h1>
+  <h1 class="center-title">Rust Magic</h1>
+
+  <h1>Pattern Matching</h1>
+  <pre style="font-size: 50%">fn solve_vertical_constraints_abs_nonreplaced(...) -> ... {
+    ...
+    let (block_start, block_end, block_size, margin_block_start, margin_block_end) =
+      match <strong style="color: red">(block_start, block_end, block_size)</strong> {
+        <strong style="color: red">(MaybeAuto::Auto, MaybeAuto::Auto, MaybeAuto::Auto)</strong> => {
+            ...
+        }
+        <strong style="color: red">(MaybeAuto::Specified(block_start), MaybeAuto::Specified(block_end),
+          MaybeAuto::Specified(block_size))</strong> => {
+            match <strong style="color: #6666ff">(block_start_margin, block_end_margin)</strong> {
+                <strong style="color: #6666ff">(MaybeAuto::Auto, MaybeAuto::Auto)</strong> => {
+                    ...
+                }
+                <strong style="color: #6666ff">(MaybeAuto::Specified(margin_block_start), MaybeAuto::Auto)</strong> => {
+                    ...
+                }
+                <strong style="color: #6666ff">(MaybeAuto::Auto, MaybeAuto::Specified(margin_block_end))</strong> => {
+                    ...
+                }
+                ...
+            }
+        }    
+    }
+    ...
+}
+  </pre>
+  <!-- Patterns make writing code from specs look fairly close to the specs -->
+
+  <h1>Macros</h1>
+  <pre style="font-size: 80%"><span class='kw'>match</span> <span class='ident'>mode</span> {
+    <span class='ident'>InBody</span> <span class='op'>=&gt;</span> <span class='macro'>match_token</span><span class='macro'>!</span>(<span class='ident'>token</span> { 
+        <span class='ident'>tag</span> <span class='kw-2'>@</span> <span class='op'>&lt;</span><span class='op'>/</span><span class='ident'>a</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='op'>/</span><span class='ident'>b</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='op'>/</span><span class='ident'>big</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='op'>/</span><span class='ident'>code</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='op'>/</span><span class='ident'>em</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='op'>/</span><span class='ident'>font</span><span class='op'>&gt;</span>
+              <span class='op'>&lt;</span><span class='op'>/</span><span class='ident'>i</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='op'>/</span><span class='ident'>nobr</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='op'>/</span><span class='ident'>s</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='op'>/</span><span class='ident'>small</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='op'>/</span><span class='ident'>strike</span><span class='op'>&gt;</span>
+              <span class='op'>&lt;</span><span class='op'>/</span><span class='ident'>strong</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='op'>/</span><span class='ident'>tt</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='op'>/</span><span class='ident'>u</span><span class='op'>&gt;</span> <span class='op'>=&gt;</span> {
+            <span class='self'>self</span>.<span class='ident'>adoption_agency</span>(<span class='ident'>tag</span>.<span class='ident'>name</span>);
+            <span class='ident'>Done</span>
+        }
+
+        <span class='ident'>tag</span> <span class='kw-2'>@</span> <span class='op'>&lt;</span><span class='ident'>h1</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='ident'>h2</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='ident'>h3</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='ident'>h4</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='ident'>h5</span><span class='op'>&gt;</span> <span class='op'>&lt;</span><span class='ident'>h6</span><span class='op'>&gt;</span> <span class='op'>=&gt;</span> {
+            <span class='self'>self</span>.<span class='ident'>close_p_element_in_button_scope</span>();
+            <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>current_node_in</span>(<span class='ident'>heading_tag</span>) {
+                <span class='comment'>// ...</span>
+  </pre>
+
+  <h1>Other things</h1>
   <ul>
     <li>Tasks and message passing</li>
-    <li>Pattern matching</li>
-    <!-- CSS specs; html5ever -->
     <li>Trait derivation</li>
     <!-- Encode/Decode make IPC easy;
          JS integration uses this for deriving trace hooks for the
