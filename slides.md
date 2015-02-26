@@ -1,8 +1,14 @@
-% My magnificent slides
+% Servo: Building a Parallel Browser
 
-Keegan McAllister
+Jack Moffitt
 
-October 16, 2014
+January 16, 2015
+
+# Introduction
+
+* Work at Mozilla Research
+* Work on Servo
+* Work on Daala
 
 # Hello, world!
 

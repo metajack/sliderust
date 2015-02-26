@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Servo: Building a Browser with Rust</title>
+  <link rel="stylesheet" href="sliderust.css">
+  <script src="sliderust.js"></script>
+</head>
+<body>
+
+  <h1 class="title center-title-long">Servo: Building a Browser with Rust</h1>
+  <p>
+    Jack Moffitt<br>
+    Mozilla Research<br>
+    February 26, 2015
+  </p>
+
+  <h1 class="big center-title-long">
+    <strong>Goal:</strong> Create a new browser engine with a generational
+    leap in performance and robustness.
+  </h1>
+  
+  <h1>High level plan</h1>
+  <ul>
+    <li>Figure out what is possible to achieve</li>
+    <!-- We think a lot. Current browsers were designed 20 years ago in a
+    radically different environment. -->
+    <li>Build a product-ready engine</li>
+    <!-- It's not good enough to have a prototype. It can't be slower than
+         current tech. We must have the same optimizations, etc. -->
+  </ul>
+
+  <h1 class="center-title">Performance</h1>
+
+  <h1>Parallelize at every level</h1>
+  <ul>
+    <li>Multiple processes (tabs, compositor, plugins, etc)</li>
+    <!-- this is important for responsiveness. example: firefox has a single
+    JS process, but the browser chrome is also written in JS. if a page has a
+    slow script, you can't scroll or switch tabs -->
+    <li>Major systems in threads (media, network, caching, script, layout,
+      painting)</li>
+    <!-- starts to use more cores. JIT compile on a background thread. decode
+      several imgaes or video frames at once. but can do more, like render on
+      separate thread, etc -->
+    <li>Algorithmic parallelism (layout every node at once, GPU
+      painting)</li>
+    <li>Data parallelism (SIMD)</li>
+  </ul>
+  <!-- Going to concentrate on algorithmic parallelism only for this talk. -->
+
+  <h1>Parallelism inside a page</h1>
+  <div class="center-title-longest" style="margin-top: 100px">
+    <img src="pinterest.jpg"
+         width=455 height=445
+         class="left"
+         style="padding: 0 20px">
+    <img src="techcrunch.png"
+         width=545 height=364
+         class="right"
+         style="padding: 40px 20px">
+  </div>
+  <!-- There are many independent structures in modern pages. We can compute
+  layout for all of them at the same time. -->
+
+  <h1>Traditional best case</h1>
+  <div class="center-title-long">
+    <img src="parlayout-1.png"
+         width=1075 height=220>
+  </div>
+  <!-- uses all the cpu, but notice that the page can't show until layout is
+  done -->
+
+  <h1>With parallel layout</h1>
+  <div class="center-title-long">
+    <img src="parlayout-2.png"
+         width=1075 height=220>
+  </div>
+  <!-- with layout finished faster, we can show hte page much earlier, which
+  will feel faster to the user -->
+  
+  <h1 class="center-title">Robustness</h1>
+
+  <h1>What does robustness mean?</h1>
+  <ul>
+    <li>Prevent security breaches</li>
+    <li>Isolate failure</li>
+    <li>Loosely couple components</li>
+    <li>Prevent or tolerate programmer error</li>
+  </ul>
+
+  <h1>Robustness at every level</h1>
+  <ul>
+    <li>Process isolation</li>
+    <li>Sandboxing</li>
+    <li>Memory safety</li>
+    <li>Fail to compile when code is wrong</li>
+  </ul>
+  <!-- first two other browsers have worked on, Rust helps with the others -->
+
+  <h1>Example: WebAudio API</h1>
+  <ul>
+    <li>34 sec-critical bugs in WebAudio</li>
+    <li>All were array index out of bounds or use after free</li>
+    <li>All would be prevented by Rust</li>
+  </ul>
+  <!-- WebAudio doesn't have any security considerations of its own. These
+  were from implementation failures. Most web features are like this. -->
+
+  <h1 class="center-title">Rust</h1>
+  <ul>
+    <li>Tasks and message passing</li>
+    <li>Pattern matching</li>
+    <!-- CSS specs; html5ever -->
+    <li>Trait derivation</li>
+    <!-- Encode/Decode make IPC easy;
+         JS integration uses this for deriving trace hooks for the
+    Spidermonkey garbage collector. -->
+    <li>Iterator invalidation (and other memory safety issues)</li>
+    <li>Data and code isolation via type system</li>
+    <!-- layout and dom data inaccessible from each other;
+         threadsafe layout;
+         JS<T> vs. JSRef<T> -->
+  </ul>
+  
+  <h1 class="center-title">Benchmarks</h1>
+
+  <h1>Layout performance</h1>
+  <div class="center-title-longest">
+    <img src="layoutperf-1.png"
+         width=1020 height=678>
+  </div>
+
+  <h1>Layout performance</h1>
+  <div class="center-title-longest">
+    <img src="layoutperf-2.png"
+         width=1020 height=668>
+  </div>
+
+  <h1>Layout performance</h1>
+  <div class="center-title-longest">
+    <img src="layoutperf-3.png"
+         width=1020 height=667>
+  </div>
+
+  <h1>Servo vs. Gecko</h1>
+  <div class="center-title-longest">
+    <img src="servo-vs-gecko-1.png"
+         width=1020 height=672>
+  </div>
+
+  <h1>Servo vs. Gecko</h1>
+  <div class="center-title-longest">
+    <img src="servo-vs-gecko-2.png"
+         width=1020 height=669>
+  </div>
+
+  <h1>Servo vs. Gecko</h1>
+  <div class="center-title-longest">
+    <img src="servo-vs-gecko-3.png"
+         width=1020 height=679>
+  </div>
+
+  <h1>Timeline (net)</h1>
+  <div class="center-title-longest">
+    <img src="timeline-1.png"
+         width=1020 height=667>
+  </div>
+
+  <h1>Timeline (local,nojs)</h1>
+  <div class="center-title-longest">
+    <img src="timeline-2.png"
+         width=1020 height=640>
+  </div>
+
+  <h1>Demos</h1>
+
+  <h1>Servo needs you!</h1>
+  <ul>
+    <li><strong>Blog:</strong> <a href="http://blog.servo.org/">http://blog.servo.org/</a></li>
+    <li><strong>GitHub:</strong> <a href="https://github.com/servo/servo">https://github.com/servo/servo</a></li>
+    <li><strong>IRC:</strong> #servo on irc.mozilla.org</li>
+  </ul>
+  <h2>Jack Moffitt</h2>
+  <ul>
+    <li><strong>Blog:</strong> <a href="http://metajack.im">http://metajack.im</a></li>
+    <li><strong>Email:</strong> <a href="mailto:jack@metajack.im">jack@metajack.im</a></li>
+    <li><strong>Twitter:</strong> <a href="https://twitter.com/metajack">@metajack</a></li>
+  </ul>
+</body>
+</html>
